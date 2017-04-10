@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="repo.libra" name="Libras's Kodi Addons" version="1.0.0" provider-name="matthew">
+    <extension point="xbmc.addon.repository" name="Libra Addon Repository">
+        <!-- <info compressed="false">http://localhost:8000/addons.xml</info>
+        <checksum>http://localhost:8000/addons.xml.md5</checksum>
+        <datadir zip="true">http://localhost:8000/</datadir> -->
+        <info compressed="false">
+            https://raw.githubusercontent.com/kientrunghuynh/kodi.repo.libra/master/dist/addons.xml
+        </info>
+        <checksum>https://raw.githubusercontent.com/kientrunghuynh/kodi.repo.libra/master/dist/addons.xml.md5</checksum>
+        <datadir zip="true">https://raw.githubusercontent.com/kientrunghuynh/kodi.repo.libra/master/dist/</datadir>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary>Libra Addon Repository</summary>
+        <description>My Pet Project</description>
+        <disclaimer></disclaimer>
+        <platform>all</platform>
+    </extension>
+</addon>
