@@ -30,7 +30,7 @@ from resources.lib.modules import playcount
 from resources.lib.modules import workers
 from resources.lib.modules import views
 
-import os,sys,re,json,urllib,urlparse,datetime
+import os,sys,re,json,urllib,urlparse,datetime, xbmc
 
 params = dict(urlparse.parse_qsl(sys.argv[2].replace('?','')))
 
@@ -93,6 +93,7 @@ class movies:
 
 
     def get(self, url, idx=True, create_directory=True):
+        # xbmc.log('[script.renegadestv] Database is locked, retrying...', xbmc.LOGDEBUG)
         try:
             try: url = getattr(self, url + '_link')
             except: pass
@@ -100,6 +101,8 @@ class movies:
             try: u = urlparse.urlparse(url).netloc.lower()
             except: pass
 
+            xbmc.log('[plugin.video.libra]::movies.movies().get(url)::' + url, xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.libra]::movies.movies().get(url)::' + u, xbmc.LOGNOTICE)
 
             if u in self.trakt_link and '/users/' in url:
                 try:

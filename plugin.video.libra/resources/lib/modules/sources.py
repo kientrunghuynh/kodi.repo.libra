@@ -883,13 +883,8 @@ class sources:
         self.metaProperty = 'plugin.video.libra.container.meta'
 
         from resources.lib.sources import sources as sources
-        from resources.lib.sources_de import sources as sources_de
-        from resources.lib.sources_fr import sources as sources_fr
-        from resources.lib.sources_pt import sources as sources_pt
-        from resources.lib.sources_pl import sources as sources_pl
-        from resources.lib.sources_ko import sources as sources_ko
 
-        self.sourceDict = sources() + sources_de() + sources_fr() + sources_pt() + sources_pl() + sources_ko()
+        self.sourceDict = sources()
 
         try:
             self.hostDict = urlresolver.relevant_resolvers(order_matters=True)

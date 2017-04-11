@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import urlparse,sys,urllib
+import urlparse,sys,urllib,xbmc
 
 params = dict(urlparse.parse_qsl(sys.argv[2].replace('?','')))
 
@@ -45,3 +45,15 @@ if action == None:
 elif action == 'movieNavigator':
     from resources.lib.indexers import navigator
     navigator.navigator().movies()
+
+elif action == 'movieGenres':
+    from resources.lib.indexers import movies
+    movies.movies().genres()
+
+elif action == 'movies':
+    from resources.lib.indexers import movies
+    movies.movies().get(url)
+
+elif action == 'play':
+    from resources.lib.modules import sources
+    sources.sources().play(title, year, imdb, tvdb, season, episode, tvshowtitle, premiered, meta, select)

@@ -19,7 +19,7 @@
 '''
 
 
-import re,urllib,urlparse,json,base64,time
+import re,urllib,urlparse,json,base64,time,xbmc
 
 from resources.lib.modules import cleantitle
 from resources.lib.modules import client
@@ -38,6 +38,7 @@ class source:
     def movie(self, imdb, title, localtitle, year):
         try:
             url = {'imdb': imdb, 'title': title, 'year': year}
+            xbmc.log('[plugin.video.libra]::vaphim:movie:' + title, xbmc.LOGNOTICE)
             url = urllib.urlencode(url)
             return url
         except:
@@ -70,6 +71,8 @@ class source:
         try:
             sources = []
 
+            xbmc.log('[plugin.video.libra]::vaphim:sources::' + url, xbmc.LOGNOTICE)
+
             if url == None: return sources
 
             if not str(url).startswith('http'):
@@ -85,6 +88,8 @@ class source:
                     url = '%s/tv-show/%s/season/%01d/episode/%01d' % (self.base_link, cleantitle.geturl(title), int(data['season']), int(data['episode']))
                 else:
                     url = '%s/movie/%s' % (self.base_link, cleantitle.geturl(title))
+
+                xbmc.log('[plugin.video.libra]::vaphim:sources::' + url, xbmc.LOGNOTICE)
 
                 result = client.request(url, limit='5')
 
