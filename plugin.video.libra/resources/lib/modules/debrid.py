@@ -19,7 +19,7 @@
 '''
 
 
-import urllib,json,time
+import urllib,json,time,xbmc
 
 from resources.lib.modules import cache
 from resources.lib.modules import control
@@ -201,7 +201,12 @@ def credentials():
         'megadebrid': {
             'user': control.setting('megadebrid.user'),
             'pass': control.setting('megadebrid.pass')
-        }}
+        },
+        'fshare': {
+            'user': control.setting('hktrung@gmail.com'),
+            'pass': control.setting('Password')
+        }
+    }
 
 
 def status():
@@ -216,116 +221,15 @@ def status():
 def resolver(url, debrid):
     u = url
     u = u.replace('filefactory.com/stream/', 'filefactory.com/file/')
+    xbmc.log('[plugin.video.libra]::debrid:resolver:' + url, xbmc.LOGNOTICE)
 
     try:
-        if not debrid == 'realdebrid' and not debrid == True: raise Exception()
+        if not debrid == 'fshare' and not debrid == True: raise Exception()
 
-        if '' in credentials()['realdebrid'].values(): raise Exception()
-        id, secret, token, refresh = credentials()['realdebrid']['id'], credentials()['realdebrid']['secret'], credentials()['realdebrid']['token'], credentials()['realdebrid']['refresh']
 
-        USER_AGENT = 'Kodi Exodus/3.0'
 
-        post = urllib.urlencode({'link': u})
-        headers = {'Authorization': 'Bearer %s' % token, 'User-Agent': USER_AGENT}
-        url = 'https://api.real-debrid.com/rest/1.0/unrestrict/link'
-
-        result = client.request(url, post=post, headers=headers, error=True)
-        result = json.loads(result)
-
-        if 'error' in result and result['error'] == 'bad_token':
-            result = client.request('https://api.real-debrid.com/oauth/v2/token', post=urllib.urlencode({'client_id': id, 'client_secret': secret, 'code': refresh, 'grant_type': 'http://oauth.net/grant_type/device/1.0'}), headers={'User-Agent': USER_AGENT}, error=True)
-            result = json.loads(result)
-            if 'error' in result: return
-
-            headers['Authorization'] = 'Bearer %s' % result['access_token']
-            result = client.request(url, post=post, headers=headers)
-            result = json.loads(result)
-
-        url = result['download']
-        return url
     except:
         pass
-
-    try:
-        if not debrid == 'premiumize' and not debrid == True: raise Exception()
-
-        if '' in credentials()['premiumize'].values(): raise Exception()
-        user, password = credentials()['premiumize']['user'], credentials()['premiumize']['pass']
-
-        url = 'http://api.premiumize.me/pm-api/v1.php?method=directdownloadlink&params[login]=%s&params[pass]=%s&params[link]=%s' % (user, password, urllib.quote_plus(u))
-        result = client.request(url, close=False)
-        url = json.loads(result)['result']['location']
-        return url
-    except:
-        pass
-
-    try:
-        if not debrid == 'alldebrid' and not debrid == True: raise Exception()
-
-        if '' in credentials()['alldebrid'].values(): raise Exception()
-        user, password = credentials()['alldebrid']['user'], credentials()['alldebrid']['pass']
-
-        login_data = urllib.urlencode({'action': 'login', 'login_login': user, 'login_password': password})
-        login_link = 'http://alldebrid.com/register/?%s' % login_data
-        cookie = client.request(login_link, output='cookie', close=False)
-
-        url = 'http://www.alldebrid.com/service.php?link=%s' % urllib.quote_plus(u)
-        result = client.request(url, cookie=cookie, close=False)
-        url = client.parseDOM(result, 'a', ret='href', attrs = {'class': 'link_dl'})[0]
-        url = client.replaceHTMLCodes(url)
-        url = '%s|Cookie=%s' % (url, urllib.quote_plus(cookie))
-        return url
-    except:
-        pass
-
-    try:
-        if not debrid == 'rpnet' and not debrid == True: raise Exception()
-
-        if '' in credentials()['rpnet'].values(): raise Exception()
-        user, password = credentials()['rpnet']['user'], credentials()['rpnet']['pass']
-
-        login_data = urllib.urlencode({'username': user, 'password': password, 'action': 'generate', 'links': u})
-        login_link = 'http://premium.rpnet.biz/client_api.php?%s' % login_data
-        result = client.request(login_link, close=False)
-        result = json.loads(result)
-        url = result['links'][0]['generated']
-        return url
-    except:
-        pass
-
-    try:
-        if not debrid == 'debridlink' and not debrid == True: raise Exception()
-
-        cred = credentials().get('debridlink', {})
-
-        if '' in cred.values(): raise Exception()
-        user, password = cred.get('user'), cred.get('pass')
-
-        post = urllib.urlencode({'pseudo': user, 'password': password})
-        result = client.request('https://debrid-link.fr/api/account/login', post=post)
-        result = json.loads(result)
-
-        if result.get('result') == 'OK':
-            token = result.get('value', {}).get('token')
-            key = result.get('value', {}).get('key')
-            offset = int(time.time()) - result.get('ts') if 'ts' in result else None
-
-            if not offset or not token or not key: raise Exception()
-
-            import hashlib
-            server_ts = int(time.time()) - int(offset)
-            signature = hashlib.sha1(str(server_ts) + '/downloader/add' + key).hexdigest()
-            headers = {'X-DL-SIGN': signature, 'X-DL-TOKEN': token, 'X-DL-TS': server_ts}
-
-            post = urllib.urlencode({'link': u})
-            result = client.request('https://debrid-link.fr/api/downloader/add', post=post, headers=headers)
-            result = json.loads(result)
-
-            if result.get('result') == 'OK':
-                return result.get('value', {}).get('downloadLink')
-    except:
-        pass
-
 
     try:
         if not debrid == 'megadebrid' and not debrid == True: raise Exception()

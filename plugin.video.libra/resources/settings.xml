@@ -30,6 +30,7 @@
 	</category>
 	<category label="32345">
 		<setting id="provider.putlocker" type="bool" label="PUTLOCKER" default="true" />
+		<setting id="provider.streamlord" type="bool" label="streamlord" default="true" />
 		<setting id="provider.vaphim" type="bool" label="VAPHIM" default="true" />
 
 	</category>
@@ -38,6 +39,10 @@
 		<setting type="lsep" label="Personal API keys provide quicker API responses." />
 		<setting type="lsep" label="Become a VIP member for many benefits at: https://fanart.tv/vip" />
 		<setting id="fanart.tv.user" type="text" option="hidden" label="32309" default="" />
+		<setting type="sep" />
+		<setting type="lsep" label="Fshare.vn" />
+		<setting id="fshare.user" type="text" label="32303" default="" />
+		<setting id="fshare.pass" type="text" option="hidden" label="32307" default="" />
 		<setting type="sep" />
 		<setting type="lsep" label="TMDb" />
 		<setting id="tm.user" type="text" option="hidden" label="32309" default="" />

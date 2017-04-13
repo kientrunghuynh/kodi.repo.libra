@@ -49,7 +49,6 @@ class sources:
     def play(self, title, year, imdb, tvdb, season, episode, tvshowtitle, premiered, meta, select):
         try:
             url = None
-
             control.moderator()
 
             items = self.getSources(title, year, imdb, tvdb, season, episode, tvshowtitle, premiered)
@@ -177,8 +176,11 @@ class sources:
 
     def playItem(self, title, source):
         try:
+            xbmc.log('[plugin.video.libra]::sources:playItem:title' + str(title), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.libra]::sources:playItem:source' + str(source), xbmc.LOGNOTICE)
             meta = control.window.getProperty(self.metaProperty)
             meta = json.loads(meta)
+            xbmc.log('[plugin.video.libra]::sources:playItem:title' + str(meta), xbmc.LOGNOTICE)
 
             year = meta['year'] if 'year' in meta else None
             season = meta['season'] if 'season' in meta else None
@@ -658,18 +660,28 @@ class sources:
     def sourcesResolve(self, item, info=False):
         try:
             self.url = None
+            xbmc.log('[plugin.video.libra]::sources:sourcesResolve:item:' + str(item), xbmc.LOGNOTICE)
 
             u = url = item['url']
+            xbmc.log('[plugin.video.libra]::sources:sourcesResolve:url:' + str(u), xbmc.LOGNOTICE)
 
             d = item['debrid'] ; direct = item['direct']
+            xbmc.log('[plugin.video.libra]::sources:sourcesResolve:d:' + str(d), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.libra]::sources:sourcesResolve:direct:' + str(direct), xbmc.LOGNOTICE)
+            xbmc.log('[plugin.video.libra]::sources:sourcesResolve:sourceDict:' + str(self.sourceDict), xbmc.LOGNOTICE)
 
             provider = item['provider']
+            xbmc.log('[plugin.video.libra]::sources:sourcesResolve:provider1111:' + str(provider), xbmc.LOGNOTICE)
             call = [i[1] for i in self.sourceDict if i[0] == provider][0]
+            xbmc.log('[plugin.video.libra]::sources:sourcesResolve:call:' + str(call), xbmc.LOGNOTICE)
             u = url = call.resolve(url)
+            xbmc.log('[plugin.video.libra]::sources:sourcesResolve:call::resolve' + str(url), xbmc.LOGNOTICE)
 
             if url == None or not '://' in str(url): raise Exception()
 
             url = url[8:] if url.startswith('stack:') else url
+
+            xbmc.log('[plugin.video.libra]::sources:sourcesResolve:url:' + str(url), xbmc.LOGNOTICE)
 
             urls = []
             for part in url.split(' , '):
@@ -893,6 +905,8 @@ class sources:
             self.hostDict = [x for y,x in enumerate(self.hostDict) if x not in self.hostDict[:y]]
         except:
             self.hostDict = []
+
+        self.hostDict = []
 
         self.hostprDict = ['1fichier.com', 'oboom.com', 'rapidgator.net', 'rg.to', 'uploaded.net', 'uploaded.to', 'ul.to', 'filefactory.com', 'nitroflare.com', 'turbobit.net', 'uploadrocket.net']
 

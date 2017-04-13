@@ -54,6 +54,15 @@ elif action == 'movies':
     from resources.lib.indexers import movies
     movies.movies().get(url)
 
+elif action == 'addItem':
+    from resources.lib.modules import sources
+    sources.sources().addItem(title)
+
 elif action == 'play':
     from resources.lib.modules import sources
     sources.sources().play(title, year, imdb, tvdb, season, episode, tvshowtitle, premiered, meta, select)
+
+elif action == 'playItem':
+    from resources.lib.modules import sources
+    xbmc.log('[plugin.video.libra]::libra:action:playItem', xbmc.LOGNOTICE)
+    sources.sources().playItem(title, source)
