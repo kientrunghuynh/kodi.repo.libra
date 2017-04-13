@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
 <addon id="plugin.video.libra"
-       version="1.0.0"
-       name="Example Kodi Video Plugin"
+       version="1.0.1"
+       name="Libra"
        provider-name="matthew">
     <requires>
         <import addon="xbmc.python" version="2.24.0"/>
+        <import addon="repository.exodus" version="1.0.0" />
+		<import addon="script.exodus.artwork" version="1.0.4" />
+		<import addon="script.exodus.metadata" version="1.0.0" />
+		<import addon="script.module.urlresolver" version="3.0.0" />
+		<import addon="script.module.metahandler" version="1.0.0" />
     </requires>
     <extension point="xbmc.python.pluginsource" library="libra.py">
         <provides>video</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
         <summary lang="en">Libra Kodi Video Plugin</summary>
-        <description lang="en">An  video plugin for Kodi mediacenter.</description>
+        <description lang="en">Personal mediacenter.</description>
         <disclaimer lang="en">Free sample videos are provided by www.vidsplay.com.</disclaimer>
         <assets>
             <icon>icon.png</icon>
@@ -21,7 +26,8 @@
             <screenshot>resources\screenshot-02.jpg</screenshot>
             <screenshot>resources\screenshot-03.jpg</screenshot>
         </assets>
-        <news>Updated with latest artwork metadata</news>
+        <news>- Changed name
+        - MVP version</news>
     </extension>
 </addon>
 
