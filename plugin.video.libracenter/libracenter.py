@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import sys
+import sys, xbmcgui, xbmcplugin, xbmc, json
 from urlparse import parse_qsl
-import xbmcgui, xbmcplugin
-
+from resources.lib.modules import client
 # Get the plugin url in plugin:// notation.
 __url__ = sys.argv[0]
 # Get the plugin handle as an integer number.
@@ -58,7 +57,12 @@ def get_categories():
     from some site or server.
     :return: list
     """
-    return VIDEOS.keys()
+    category_endpoint = 'http://localhost:8080/api/genres'
+    headers = {'Content-Type': 'application/json'}
+    categories = client.request(category_endpoint, headers=headers)
+    xbmc.log('[plugin.video.libracenter]::get_categories: ' + str(categories), xbmc.LOGNOTICE)
+    categories = json.loads(categories)
+    return categories
 
 
 def get_videos(category):
@@ -69,7 +73,12 @@ def get_videos(category):
     :param category: str
     :return: list
     """
-    return VIDEOS[category]
+    video_endpoint = 'http://localhost:8080/api/movies'
+    headers = {'Content-Type': 'application/json'}
+    videos = client.request(video_endpoint, headers=headers)
+    videos = json.loads(videos)
+    xbmc.log('[plugin.video.libracenter]::get_videos: ' + str(videos), xbmc.LOGNOTICE)
+    return videos
 
 
 def list_categories():
@@ -83,20 +92,22 @@ def list_categories():
     listing = []
     # Iterate through categories
     for category in categories:
+        # xbmc.log('[plugin.video.libracenter]::list_categories: category' + str(category), xbmc.LOGNOTICE)
         # Create a list item with a text label and a thumbnail image.
-        list_item = xbmcgui.ListItem(label=category, thumbnailImage=VIDEOS[category][0]['thumb'])
+        # list_item = xbmcgui.ListItem(label=category, thumbnailImage=VIDEOS[category][0]['thumb'])
+        list_item = xbmcgui.ListItem(label=category['name'])
         # Set a fanart image for the list item.
         # Here we use the same image as the thumbnail for simplicity's sake.
-        list_item.setProperty('fanart_image', VIDEOS[category][0]['thumb'])
+        # list_item.setProperty('fanart_image', VIDEOS[category][0]['thumb'])
         # Set additional info for the list item.
         # Here we use a category name for both properties for for simplicity's sake.
         # setInfo allows to set various information for an item.
         # For available properties see the following link:
         # http://mirrors.xbmc.org/docs/python-docs/15.x-isengard/xbmcgui.html#ListItem-setInfo
-        list_item.setInfo('video', {'title': category, 'genre': category})
+        list_item.setInfo('video', {'title': category['name'], 'genre': category['name']})
         # Create a URL for the plugin recursive callback.
         # Example: plugin://plugin.video.example/?action=listing&category=Animals
-        url = '{0}?action=listing&category={1}'.format(__url__, category)
+        url = '{0}?action=listing&category={1}'.format(__url__, category['slug'])
         # is_folder = True means that this item opens a sub-list of lower level items.
         is_folder = True
         # Add our item to the listing as a 3-element tuple.
@@ -110,44 +121,48 @@ def list_categories():
     # Finish creating a virtual folder.
     xbmcplugin.endOfDirectory(__handle__)
 
-    def list_videos(category):
-        """
-        Create the list of playable videos in the Kodi interface.
-        :param category: str
-        :return: None
-        """
-        # Get the list of videos in the category.
-        videos = get_videos(category)
-        # Create a list for our items.
-        listing = []
-        # Iterate through videos.
-        for video in videos:
-            # Create a list item with a text label and a thumbnail image.
-            list_item = xbmcgui.ListItem(label=video['name'], thumbnailImage=video['thumb'])
-            # Set a fanart image for the list item.
-            # Here we use the same image as the thumbnail for simplicity's sake.
-            list_item.setProperty('fanart_image', video['thumb'])
-            # Set additional info for the list item.
-            list_item.setInfo('video', {'title': video['name'], 'genre': video['genre']})
-            # Set 'IsPlayable' property to 'true'.
-            # This is mandatory for playable items!
-            list_item.setProperty('IsPlayable', 'true')
-            # Create a URL for the plugin recursive callback.
-            # Example: plugin://plugin.video.example/?action=play&video=http://www.vidsplay.com/vids/crab.mp4
-            url = '{0}?action=play&video={1}'.format(__url__, video['video'])
-            # Add the list item to a virtual Kodi folder.
-            # is_folder = False means that this item won't open any sub-list.
-            is_folder = False
-            # Add our item to the listing as a 3-element tuple.
-            listing.append((url, list_item, is_folder))
-        # Add our listing to Kodi.
-        # Large lists and/or slower systems benefit from adding all items at once via addDirectoryItems
-        # instead of adding one by ove via addDirectoryItem.
-        xbmcplugin.addDirectoryItems(__handle__, listing, len(listing))
-        # Add a sort method for the virtual folder items (alphabetically, ignore articles)
-        xbmcplugin.addSortMethod(__handle__, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
-        # Finish creating a virtual folder.
-        xbmcplugin.endOfDirectory(__handle__)
+
+def list_videos(category):
+    """
+    Create the list of playable videos in the Kodi interface.
+    :param category: str
+    :return: None
+    """
+    # Get the list of videos in the category.
+    videos = get_videos(category)
+    # Create a list for our items.
+    listing = []
+    # Iterate through videos.
+    for video in videos:
+        xbmc.log('[plugin.video.libracenter]::video: ' + str(video), xbmc.LOGNOTICE)
+        thumbnail = 'https://image.tmdb.org/t/p/w500' + video['poster_path']
+        backdrop = 'http://image.tmdb.org/t/p/original' + video['backdrop_path']
+        # Create a list item with a text label and a thumbnail image.
+        list_item = xbmcgui.ListItem(label=video['title'], thumbnailImage=thumbnail)
+        # Set a fanart image for the list item.
+        # Here we use the same image as the thumbnail for simplicity's sake.
+        list_item.setProperty('fanart_image', backdrop)
+        # Set additional info for the list item.
+        list_item.setInfo('video', {'title': video['title']})
+        # Set 'IsPlayable' property to 'true'.
+        # This is mandatory for playable items!
+        list_item.setProperty('IsPlayable', 'true')
+        # Create a URL for the plugin recursive callback.
+        # Example: plugin://plugin.video.example/?action=play&video=http://www.vidsplay.com/vids/crab.mp4
+        url = '{0}?action=play&video={1}'.format(__url__, video['imdb_id'])
+        # Add the list item to a virtual Kodi folder.
+        # is_folder = False means that this item won't open any sub-list.
+        is_folder = False
+        # Add our item to the listing as a 3-element tuple.
+        listing.append((url, list_item, is_folder))
+    # Add our listing to Kodi.
+    # Large lists and/or slower systems benefit from adding all items at once via addDirectoryItems
+    # instead of adding one by ove via addDirectoryItem.
+    xbmcplugin.addDirectoryItems(__handle__, listing, len(listing))
+    # Add a sort method for the virtual folder items (alphabetically, ignore articles)
+    xbmcplugin.addSortMethod(__handle__, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
+    # Finish creating a virtual folder.
+    xbmcplugin.endOfDirectory(__handle__)
 
 
 def play_video(path):
